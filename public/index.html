@@ -1,0 +1,299 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>ContraLens - Control de Contratos en Supervisión</title>
+  <link rel="stylesheet" href="css/styles_supervision.css">
+  <!-- Cargar Chart.js y Font Awesome -->
+  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+</head>
+<body>
+  <!-- Header Global con Buscador -->
+  <header class="global-header">
+    <div class="header-content">
+      <input type="text" id="globalSearch" placeholder="Buscar contratos, tareas o clientes...">
+      <button id="btnSearch"><i class="search-icon fas fa-search"></i></button>
+    </div>
+  </header>
+
+  <!-- Botón para menú móvil (visible en pantallas pequeñas) -->
+  <button class="mobile-menu-toggle"><i class="fas fa-bars"></i></button>
+
+  <div class="container">
+    <!-- Sidebar: Logo, Título y Pestañas -->
+    <nav class="sidebar">
+      <div class="sidebar-header">
+        <img src="img/logo.png" alt="Logo ContraLens" class="logo">
+        <h1 class="app-title">ContraLens</h1>
+      </div>
+      <ul>
+        <li class="nav-item active" data-section="dashboard">
+          <span class="icon"><i class="fas fa-home"></i></span>Dashboard
+        </li>
+        <li class="nav-item" data-section="contratos">
+          <span class="icon"><i class="fas fa-file-alt"></i></span>Contratos
+        </li>
+        <li class="nav-item" data-section="supervision">
+          <span class="icon"><i class="fas fa-tools"></i></span>Supervisión
+        </li>
+        <li class="nav-item" data-section="calendario">
+          <span class="icon"><i class="fas fa-calendar-alt"></i></span>Calendario
+        </li>
+        <li class="nav-item" data-section="reportes">
+          <span class="icon"><i class="fas fa-chart-bar"></i></span>Reportes
+        </li>
+        <li class="nav-item" data-section="configuracion">
+          <span class="icon"><i class="fas fa-cog"></i></span>Configuración
+        </li>
+      </ul>
+    </nav>
+
+    <!-- Área Principal de Contenido -->
+    <main class="content">
+      <!-- Dashboard -->
+      <section id="dashboard" class="section active">
+        <header>
+          <h1>Dashboard</h1>
+        </header>
+        <div class="dashboard-widgets">
+          <div class="widget calendar-widget">
+            <h2>Calendario de Eventos</h2>
+            <p>(Calendario integrado aquí)</p>
+          </div>
+          <div class="widget progress-widget">
+            <h2>Progreso de Tareas</h2>
+            <canvas id="progressChart"></canvas>
+          </div>
+          <div class="widget notifications-widget">
+            <h2>Notificaciones</h2>
+            <ul>
+              <li>Contrato X vence en 5 días</li>
+              <li>Revisión pendiente para Contrato Y</li>
+            </ul>
+          </div>
+          <div class="widget quick-access-widget">
+            <h2>Accesos Rápidos</h2>
+            <button>Descargar Reporte Mensual</button>
+            <button>Ver Documentos Firmados</button>
+          </div>
+        </div>
+      </section>
+
+      <!-- Contratos -->
+      <section id="contratos" class="section">
+        <header>
+          <h1>Contratos</h1>
+          <div class="contratos-actions">
+            <button id="btnAgregarContrato" class="btn-agregar">Agregar Contrato</button>
+            <div class="filters">
+              <input type="text" id="filterCliente" placeholder="Filtrar por cliente">
+              <input type="text" id="filterMonto" placeholder="Filtrar por monto">
+              <input type="date" id="filterFechaFirma">
+              <select id="filterEstado">
+                <option value="">Estado</option>
+                <option value="activo">🟢 Activo</option>
+                <option value="revision">🟡 En revisión</option>
+                <option value="expirado">🔴 Expirado</option>
+              </select>
+            </div>
+          </div>
+          <div class="vista-toggle">
+            <button id="tablaView">Vista Tabla</button>
+            <button id="tarjetaView">Vista Tarjeta</button>
+          </div>
+        </header>
+        <div class="contratos-container">
+          <table id="tablaContratos">
+            <thead>
+              <tr>
+                <th>Convenio</th>
+                <th>Número de Contrato</th>
+                <th>Nombre del Contratista</th>
+                <th>Representante Legal</th>
+                <th>NIT Empresa</th>
+                <th>Objeto</th>
+                <th>Valor Inicial</th>
+                <th>Adiciones</th>
+                <th>Valor Final</th>
+                <th>Fecha Suscripción</th>
+                <th>Fecha Inicio</th>
+                <th>Prórrogas</th>
+                <th>Fecha Final</th>
+                <th>Número de Póliza</th>
+                <th>Estado</th>
+                <th>Acciones</th>
+              </tr>
+            </thead>
+            <tbody>
+              <!-- Los contratos se agregarán dinámicamente -->
+            </tbody>
+          </table>
+          <div id="tarjetasContratos" class="cards-view" style="display: none;">
+            <!-- Tarjetas de contratos se generarán dinámicamente -->
+          </div>
+        </div>
+      </section>
+
+      <!-- Supervisión -->
+      <section id="supervision" class="section">
+        <header>
+          <h1>Supervisión</h1>
+        </header>
+        <div class="supervision-container">
+          <form id="supervisionForm">
+            <div class="form-group">
+              <label for="numeroContratoSupervision">Número de Contrato:</label>
+              <input type="text" id="numeroContratoSupervision" name="numeroContratoSupervision" required>
+            </div>
+            <div class="form-group">
+              <label for="prioridadTarea">Prioridad:</label>
+              <select id="prioridadTarea" name="prioridadTarea" required>
+                <option value="alta">Urgente</option>
+                <option value="normal">Normal</option>
+                <option value="baja">Baja</option>
+              </select>
+            </div>
+            <div class="form-group">
+              <label for="observaciones">Observaciones/Tareas:</label>
+              <textarea id="observaciones" name="observaciones" rows="4" required></textarea>
+            </div>
+            <div class="form-group">
+              <label for="adjuntarArchivo">Adjuntar Archivo:</label>
+              <input type="file" id="adjuntarArchivo" name="adjuntarArchivo">
+            </div>
+            <button type="submit">Guardar Supervisión</button>
+          </form>
+          <div class="timeline">
+            <h2>Línea de Tiempo Interactiva</h2>
+            <p>(Visualización de hitos y dependencias)</p>
+          </div>
+          <div class="comentarios">
+            <h2>Historial y Comentarios</h2>
+            <p>(Registro de cambios y notas)</p>
+          </div>
+        </div>
+      </section>
+
+      <!-- Calendario -->
+      <section id="calendario" class="section">
+        <header>
+          <h1>Calendario</h1>
+        </header>
+        <div class="calendario-container">
+          <p>(Vista Mensual/Semanal con eventos vinculados a contratos)</p>
+          <p>(Sincronización con Google Calendar opcional)</p>
+        </div>
+      </section>
+
+      <!-- Reportes -->
+      <section id="reportes" class="section">
+        <header>
+          <h1>Reportes</h1>
+        </header>
+        <div class="reportes-container">
+          <p>(Generar informes personalizados: filtrar por período, tipo de contrato, cliente, etc.)</p>
+          <button>Exportar a PDF</button>
+          <button>Exportar a Excel</button>
+          <p>(Plantillas predefinidas: Reporte de cumplimiento, resumen financiero, etc.)</p>
+        </div>
+      </section>
+
+      <!-- Configuración -->
+      <section id="configuracion" class="section">
+        <header>
+          <h1>Configuración</h1>
+        </header>
+        <div class="configuracion-container">
+          <h2>Gestión de Usuarios</h2>
+          <p>(Roles: Admin, Editor, Lector)</p>
+          <h2>Personalización de Alertas</h2>
+          <p>(Definir cuándo y cómo recibir notificaciones, por ejemplo, email cuando un contrato esté próximo a vencer)</p>
+          <button>Guardar Configuración</button>
+        </div>
+      </section>
+    </main>
+  </div>
+
+  <!-- Modal para Agregar/Editar Contrato -->
+  <div id="modalAgregarContrato" class="modal">
+    <div class="modal-content">
+      <span class="close-modal">&times;</span>
+      <h2 id="modalTitle">Agregar Nuevo Contrato</h2>
+      <form id="contratoForm">
+        <div class="form-group">
+          <label for="convenio">Convenio:</label>
+          <input type="text" id="convenio" name="convenio" required>
+        </div>
+        <div class="form-group">
+          <label for="numeroContrato">Número de Contrato:</label>
+          <input type="text" id="numeroContrato" name="numeroContrato" required>
+        </div>
+        <div class="form-group">
+          <label for="nombreContratista">Nombre del Contratista:</label>
+          <input type="text" id="nombreContratista" name="nombreContratista" required>
+        </div>
+        <div class="form-group">
+          <label for="representanteLegal">Representante Legal:</label>
+          <input type="text" id="representanteLegal" name="representanteLegal" required>
+        </div>
+        <div class="form-group">
+          <label for="nitEmpresa">NIT de la Empresa Contratada:</label>
+          <input type="text" id="nitEmpresa" name="nitEmpresa"
+                 pattern="[0-9]{9}-[0-9]"
+                 title="Formato NIT: 123456789-0" required>
+        </div>
+        <div class="form-group">
+          <label for="objetoContrato">Objeto del Contrato:</label>
+          <textarea id="objetoContrato" name="objetoContrato" rows="3" required></textarea>
+        </div>
+        <div class="form-group">
+          <label for="valorInicial">Valor Inicial del Contrato:</label>
+          <input type="number" id="valorInicial" name="valorInicial" required>
+        </div>
+        <div class="form-group">
+          <label>Adiciones al Contrato:</label>
+          <div id="adicionesContainer">
+            <!-- Campos dinámicos para adiciones -->
+          </div>
+          <button type="button" id="btnAgregarAdicion" class="btn-add-dynamic">Agregar Adición</button>
+        </div>
+        <div class="form-group">
+          <label for="valorFinal">Valor Final del Contrato:</label>
+          <input type="number" id="valorFinal" name="valorFinal" required>
+        </div>
+        <div class="form-group">
+          <label for="fechaSuscripcion">Fecha de Suscripción del Contrato:</label>
+          <input type="date" id="fechaSuscripcion" name="fechaSuscripcion" required>
+        </div>
+        <div class="form-group">
+          <label for="fechaInicio">Fecha de Inicio:</label>
+          <input type="date" id="fechaInicio" name="fechaInicio" required>
+        </div>
+        <div class="form-group">
+          <label>Prórrogas:</label>
+          <div id="prorrogasContainer">
+            <!-- Campos dinámicos para prórrogas -->
+          </div>
+          <button type="button" id="btnAgregarProrroga" class="btn-add-dynamic">Agregar Prórroga</button>
+        </div>
+        <div class="form-group">
+          <label for="fechaFinal">Fecha Final:</label>
+          <input type="date" id="fechaFinal" name="fechaFinal" required>
+        </div>
+        <div class="form-group">
+          <label>Número de Póliza:</label>
+          <div id="polizaContainer">
+            <!-- Campos dinámicos para póliza -->
+          </div>
+          <button type="button" id="btnAgregarPoliza" class="btn-add-dynamic">Agregar Modificación de Póliza</button>
+        </div>
+        <button type="submit" id="btnGuardarContrato">Guardar Contrato</button>
+      </form>
+    </div>
+  </div>
+
+  <script src="js/codigo_supervision.js" defer></script>
+</body>
+</html>
